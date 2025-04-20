@@ -1,48 +1,66 @@
 #输入模块（后期转换成可视化按钮选择）
 ##步骤一：输入
 def get_input():
-    depth,size,form = get_valid_input('foundation_pit_assignment','请输入基坑参数【深度(m)/尺寸/形状】:')
-    layer_type,underground_water_level,bearing_capacity= get_valid_input('geological_conditions','请输入地质条件【图层类型/地下水位/承载力】:')
-    surrounding_buildings,pipeline_distribution,traffic_flow= get_valid_input('environmental_assignment','请输入环境参数【周边建筑/管线分布/交通流量】:')
-    time_limit,equipment_constraints,cost_budget= get_valid_input('construction_requirements','请输入【工期/设备限制/成本预算】:')
+    foundation_pit_assignment = input('请输入基坑参数【深度(m)/底面积(m^2)/形状】:').split()
+    geological_conditions = input('请输入地质条件【土层类型/地下水位(m)/承载力(kPa)】:').split()
+    environmental_assignment = input('请输入环境参数【周边建筑/管线分布/交通流量】:').split()
+    construction_requirements = input('请输入【工期(天)/设备限制/成本预算（万）】:').split()
+    model = {
+        'FoundationPitAssignment':{
+            'depth':0.0,
+            'size':0.0,
+            'shape':'未知'
+        },
+        'GeologicalConditions':{
+            'earth_type':'未知',
+            'underground_water_level':0.0,
+            'bearing_capacity':0.0
+        },
+        'EnvironmentalAssignment':{
+            'surrounding_buildings':'未知',
+            'piping_distribution':'未知',
+            'traffic_flow':'未知'
+        },
+        'ConstructionRequirements':{
+            'deadline':0,
+            'equipment_limit':'未知',
+            'cost_budget':0.0
+        }
+    }
+    try:
+        if len(foundation_pit_assignment) and len(geological_conditions) and len(environmental_assignment) and len(construction_requirements)!=3:
+            raise ValueError('需要输入三个参数')
+        model['FoundationPitAssignment']['depth'] = float(foundation_pit_assignment[0])
+        model['FoundationPitAssignment']['size']  = float(foundation_pit_assignment[1])
+        model['FoundationPitAssignment']['shape']= foundation_pit_assignment[3]
+        if model['FoundationPitAssignment']['shape'].isalpha():
+            raise ValueError('需要输入字符串')
 
-##步骤二：错误输入处理
-def get_valid_input(date_type,welcome_word='请输入'):
-    while True:
-        try:
-            # 获取并分割输入（假设输入格式：num1 num2 string）
-            inputs = input(welcome_word).split()
+        model['GeologicalConditions']['earth_type'] = geological_conditions[0]
+        if model['GeologicalConditions']['earth_type'].isalpha():
+            raise ValueError('需要输入字符串')
+        model['GeologicalConditions']['underground_water_level'] = float(geological_conditions[1])
+        model['GeologicalConditions']['bearing_capacity'] = float(geological_conditions[2])
 
-            if len(inputs) != 3:
-                raise ValueError("需要输入三个参数")
+        model['EnvironmentalAssignment']['surrounding_buildings'] = environmental_assignment[0]
+        model['EnvironmentalAssignment']['piping_distribution'] = environmental_assignment[1]
+        model['EnvironmentalAssignment']['surrounding_buildings'] = environmental_assignment[2]
+        if model['EnvironmentalAssignment']['surrounding_buildings'].isalpha() or model['EnvironmentalAssignment']['piping_distribution'].isalpha() or model['EnvironmentalAssignment']['surrounding_buildings'].isalpha():
+            raise ValueError('需要输入字符串')
 
-            # 验证数字部分
-            match date_type:
-                case 'foundation_pit_assignment':
-                    num1 = float(inputs[0])
-                    num2 = float(inputs[1])
-                    if not inputs[2].isalpha():
-                        raise ValueError("字符串必须只包含字母")
-                    return num1,num2,inputs[2]
-                case 'geological_conditions':
-                    if not inputs[0].isalpha():
-                        raise ValueError("字符串必须只包含字母")
-                    num1 = float(inputs[1])
-                    num2 = float(inputs[2])
-                    return inputs[0],num1,num2
-                case 'environmental_assignment':
-                    return inputs[0],inputs[1],inputs[2]
-                case 'construction_requirements':
-                    num1 = float(inputs[0])
-                    if not inputs[1].isalpha():
-                        raise ValueError("字符串必须只包含字母")
-                    num2 = inputs[2]
-                    return num1,inputs[1],num2
+        model['ConstructionRequirements']['deadline'] = int(construction_requirements[0])
+        model['ConstructionRequirements']['equipment_limit'] = construction_requirements[1]
+        if model['ConstructionRequirements']['equipment_limit'].isalpha():
+            raise ValueError('需要输入字符串')
+        model['ConstructionRequirements']['cost_budget'] = float(construction_requirements[2])
 
-        except ValueError as e:
+        return model
+    except ValueError as e:
             print(f"输入错误: {e}\n请重新输入:")
-        except Exception as e:
+    except Exception as e:
             print(f"未知错误: {e}\n请重新输入:")
+
+model1 = get_input()
 ##步骤三：数据格式化
 
 ##步骤四：生成工程模型（数据格式：字典+列表+元组）
